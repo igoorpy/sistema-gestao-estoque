@@ -2,8 +2,9 @@ import sqlite3
 from database.connection import conectar
 
 def cadastrar_produto(nome, categoria, preco, quantidade):
+    """Insere um novo produto no banco de dados."""
     if preco <= 0 or quantidade < 0:
-        print("Erro: O preco deve ser maior que zero e a quantidade nao pode ser negativa.")
+        print("Erro: O preço deve ser maior que zero e a quantidade não pode ser negativa.")
         return False
 
     try:
@@ -23,7 +24,9 @@ def cadastrar_produto(nome, categoria, preco, quantidade):
         print(f"Erro ao cadastrar produto no banco: {e}")
         return False
 
+
 def listar_produtos():
+    """Retorna e exibe a lista de todos os produtos cadastrados."""
     try:
         conexao = conectar()
         cursor = conexao.cursor()
@@ -44,3 +47,61 @@ def listar_produtos():
     except sqlite3.Error as e:
         print(f"Erro ao listar produtos: {e}")
         return []
+
+
+def atualizar_produto(produto_id, novo_nome, nova_categoria, novo_preco, nova_quantidade):
+    """Atualiza as informações de um produto existente pelo seu ID."""
+    if novo_preco <= 0 or nova_quantidade < 0:
+        print("Erro: O preço deve ser maior que zero e a quantidade não pode ser negativa.")
+        return False
+
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+
+        cursor.execute("SELECT id FROM produtos WHERE id = ?", (produto_id,))
+        if not cursor.fetchone():
+            print(f"Erro: Produto com ID {produto_id} não encontrado.")
+            conexao.close()
+            return False
+
+        cursor.execute("""
+            UPDATE produtos
+            SET nome = ?, categoria = ?, preco = ?, quantidade = ?
+            WHERE id = ?
+        """, (novo_nome, nova_categoria, novo_preco, nova_quantidade, produto_id))
+
+        conexao.commit()
+        conexao.close()
+        print(f"Produto ID {produto_id} atualizado com sucesso!")
+        return True
+    except sqlite3.Error as e:
+        print(f"Erro ao atualizar produto: {e}")
+        return False
+
+
+def deletar_produto(produto_id):
+    """Remove um produto do banco de dados pelo seu ID."""
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+
+        cursor.execute("SELECT nome FROM produtos WHERE id = ?", (produto_id,))
+        produto = cursor.fetchone()
+
+        if not produto:
+            print(f"Erro: Produto com ID {produto_id} não encontrado.")
+            conexao.close()
+            return False
+
+        nome_produto = produto[0]
+
+        cursor.execute("DELETE FROM produtos WHERE id = ?", (produto_id,))
+
+        conexao.commit()
+        conexao.close()
+        print(f"Produto '{nome_produto}' (ID {produto_id}) removido com sucesso!")
+        return True
+    except sqlite3.Error as e:
+        print(f"Erro ao deletar produto: {e}")
+        return False

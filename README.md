@@ -1,22 +1,27 @@
-# Sistema de Gestão de Estoque e Vendas (Python + SQLite)
+# Sistema de Gestão de Estoque e Vendas
 
-Sistema de gerenciamento de estoque, cadastro de produtos e controle de vendas desenvolvido em Python com persistência de dados em banco relacional SQLite.
+Sistema de gerenciamento de estoque, cadastro de produtos e controle de vendas desenvolvido em Python com interface Web em HTML5/CSS3 e persistência de dados em banco relacional SQLite.
 
-O objetivo deste projeto é consolidar conceitos de desenvolvimento de software, arquitetura modular, manipulação de bancos de dados relacionais e controle de versão.
+O objetivo deste projeto é consolidar conceitos de desenvolvimento de software, arquitetura modular, manipulação de bancos de dados relacionais, desenvolvimento web backend e controle de versão.
 
-Projetado para evolução progressiva, com futuras atualizações previstas para incluir interface web (HTML/CSS), novos relatórios e expansão das regras de negócio.
-
-## Estrutura Atual do Projeto
+## Estrutura do Projeto
 
 ```text
 sistema-gestao-estoque/
 │
 ├── database/
-│   ├── __init__.py         #Pacote Python
-│   ├── connection.py       #Conexão e criação das tabelas sqlite
-│   ├── produtos.py         #Módulo de cad e listagem de produtos
-│   └── vendas.py           #Módulo de vendas e relatórios
+│   ├── __init__.py         # Pacote Python
+│   ├── connection.py       # Conexão e criação das tabelas SQLite
+│   ├── produtos.py         # Módulo de cadastro, listagem, edição e remoção
+│   └── vendas.py           # Módulo de vendas e relatórios
 │
-├── main.py                 #Ponto de entrada da aplicação (CLI)
-├── .gitignore              #Arquivos ignorados pelo Git
-└── README.md               #Documentação do projeto
+├── static/
+│   └── style.css           # Estilização visual em CSS
+│
+├── templates/
+│   └── produtos.html       # Interface Web com formulário e tabela de estoque
+│
+├── .gitignore              # Arquivos ignorados pelo Git (.venv, .db, cache)
+├── app.py                  # Servidor Web Flask (Backend)
+├── main.py                 # Interface legada via CLI (Terminal)
+└── README.md               # Documentação técnica do projeto

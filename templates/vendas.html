@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Estoque - Vendas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="topbar-container">
+            <h2>Sistema de Gestão de Estoque</h2>
+            <nav class="nav-links">
+                <a href="/produtos">← Produtos</a>
+                <a href="/vendas" class="active">Módulo de Vendas</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        
+        <!-- Dashboard de Faturamento -->
+        <section class="summary-card">
+            <div class="summary-info">
+                <span class="summary-label">Faturamento Total Acumulado</span>
+                <span class="summary-value">R$ {{ "%.2f"|format(total_faturamento) }}</span>
+            </div>
+        </section>
+
+        <!-- Formulário de Registro de Venda -->
+        <section class="card">
+            <div class="card-header">
+                <h3>Registrar Nova Venda</h3>
+            </div>
+            <form action="/vendas/registrar" method="POST" class="form-grid-vendas">
+                <div class="form-group span-4">
+                    <label>Selecione o Produto</label>
+                    <select name="produto_id" required>
+                        <option value="">-- Escolha um produto em estoque --</option>
+                        {% for prod in produtos %}
+                        <option value="{{ prod[0] }}">{{ prod[1] }} | R$ {{ "%.2f"|format(prod[3]) }} (Disponível: {{ prod[4] }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group span-2">
+                    <label>Quantidade</label>
+                    <input type="number" name="quantidade" min="1" placeholder="Qtd" required>
+                </div>
+
+                <div class="form-group btn-group">
+                    <button type="submit" class="btn btn-success">Confirmar Venda</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Histórico de Vendas -->
+        <section class="card">
+            <div class="card-header">
+                <h3>Histórico de Transações</h3>
+            </div>
+            {% if vendas %}
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID Venda</th>
+                            <th>Produto</th>
+                            <th>Qtd Vendida</th>
+                            <th>Preço Unit.</th>
+                            <th>Total da Venda</th>
+                            <th>Data/Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in vendas %}
+                        <tr>
+                            <td><span class="badge-id">#{{ v[0] }}</span></td>
+                            <td class="font-medium">{{ v[1] }}</td>
+                            <td>{{ v[2] }} un.</td>
+                            <td>R$ {{ "%.2f"|format(v[3]) }}</td>
+                            <td class="font-bold text-success">R$ {{ "%.2f"|format(v[4]) }}</td>
+                            <td class="text-muted">{{ v[5] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="empty-state">Nenhuma venda registrada até o momento.</p>
+            {% endif %}
+        </section>
+    </main>
+
+</body>
+</html>

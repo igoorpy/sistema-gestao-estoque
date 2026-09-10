@@ -7,7 +7,7 @@ if DIRETORIO_ATUAL not in sys.path:
 
 from flask import Flask, render_template, request, redirect, url_for
 from database.connection import criar_tabelas
-from database.produtos import cadastrar_produto, listar_produtos
+from database.produtos import cadastrar_produto, listar_produtos, obter_metricas_estoque
 from database.vendas import registrar_venda, buscar_vendas_web
 
 app = Flask(__name__)
@@ -18,7 +18,8 @@ criar_tabelas()
 @app.route("/produtos")
 def pagina_produtos():
     produtos = listar_produtos()
-    return render_template("produtos.html", produtos=produtos)
+    metricas = obter_metricas_estoque()
+    return render_template("produtos.html", produtos=produtos, metricas=metricas)
 
 @app.route("/produtos/cadastrar", methods=["POST"])
 def rota_cadastrar_produto():
@@ -36,14 +37,12 @@ def rota_cadastrar_produto():
 
     return redirect("/produtos")
 
-# Rota para exibir a página de vendas e relatórios
 @app.route("/vendas")
 def pagina_vendas():
     produtos = listar_produtos()
     vendas, faturamento = buscar_vendas_web()
     return render_template("vendas.html", produtos=produtos, vendas=vendas, total_faturamento=faturamento)
 
-# Rota para processar o formulário de vendas
 @app.route("/vendas/registrar", methods=["POST"])
 def rota_registrar_venda():
     produto_id_texto = request.form.get("produto_id", "").strip()

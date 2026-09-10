@@ -105,3 +105,26 @@ def deletar_produto(produto_id):
     except sqlite3.Error as e:
         print(f"Erro ao deletar produto: {e}")
         return False
+    
+def obter_metricas_estoque():
+    """Retorna estatísticas do estoque: total de produtos, valor investido e itens críticos."""
+    try:
+        conexao = conectar()
+        cursor = conexao.cursor()
+
+        cursor.execute("SELECT quantidade, preco FROM produtos")
+        produtos = cursor.fetchall()
+        conexao.close()
+
+        total_itens = len(produtos)
+        valor_total_estoque = sum(p[0] * p[1] for p in produtos) if produtos else 0.0
+        itens_criticos = sum(1 for p in produtos if p[0] <= 3)
+
+        return {
+            "total_itens": total_itens,
+            "valor_total": valor_total_estoque,
+            "itens_criticos": itens_criticos
+        }
+    except sqlite3.Error as e:
+        print(f"Erro ao calcular métricas: {e}")
+        return {"total_itens": 0, "valor_total": 0.0, "itens_criticos": 0}

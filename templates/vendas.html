@@ -24,7 +24,7 @@
         <section class="summary-card">
             <div class="summary-info">
                 <span class="summary-label">Faturamento Total Acumulado</span>
-                <span class="summary-value">R$ {{ "%.2f"|format(total_faturamento) }}</span>
+                <span class="summary-value">R$ {{ total_faturamento|moeda }}</span>
             </div>
         </section>
 
@@ -34,17 +34,27 @@
                 <h3>Registrar Nova Venda</h3>
             </div>
             <form action="/vendas/registrar" method="POST" class="form-grid-vendas">
-                <div class="form-group span-4">
+                <div class="form-group span-3">
                     <label>Selecione o Produto</label>
                     <select name="produto_id" required>
                         <option value="">-- Escolha um produto em estoque --</option>
                         {% for prod in produtos %}
-                        <option value="{{ prod[0] }}">{{ prod[1] }} | R$ {{ "%.2f"|format(prod[3]) }} (Disponível: {{ prod[4] }})</option>
+                        <option value="{{ prod[0] }}">{{ prod[1] }} | R$ {{ prod[3]|moeda }} (Em estoque: {{ prod[4] }})</option>
                         {% endfor %}
                     </select>
                 </div>
 
                 <div class="form-group span-2">
+                    <label>Forma de Pagamento</label>
+                    <select name="forma_pagamento" required>
+                        <option value="PIX">PIX</option>
+                        <option value="Cartão de Crédito">Cartão de Crédito</option>
+                        <option value="Cartão de Débito">Cartão de Débito</option>
+                        <option value="Dinheiro" selected>Dinheiro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label>Quantidade</label>
                     <input type="number" name="quantidade" min="1" placeholder="Qtd" required>
                 </div>
@@ -65,11 +75,12 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th style="width: 80px;">ID Venda</th>
+                            <th style="width: 70px;">ID Venda</th>
                             <th>Produto</th>
-                            <th>Qtd Vendida</th>
+                            <th>Qtd</th>
                             <th>Preço Unit.</th>
-                            <th>Total da Venda</th>
+                            <th>Total</th>
+                            <th>Pagamento</th>
                             <th>Data/Hora</th>
                         </tr>
                     </thead>
@@ -79,9 +90,10 @@
                             <td><span class="badge-id">#{{ v[0] }}</span></td>
                             <td class="font-medium">{{ v[1] }}</td>
                             <td>{{ v[2] }} un.</td>
-                            <td>R$ {{ "%.2f"|format(v[3]) }}</td>
-                            <td class="font-bold text-success">R$ {{ "%.2f"|format(v[4]) }}</td>
-                            <td class="text-muted">{{ v[5] }}</td>
+                            <td>R$ {{ v[3]|moeda }}</td>
+                            <td class="font-bold text-success">R$ {{ v[4]|moeda }}</td>
+                            <td><span class="tag-category">{{ v[5] }}</span></td>
+                            <td class="text-muted">{{ v[6] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

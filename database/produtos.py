@@ -34,6 +34,42 @@ def listar_produtos():
         print(f"Erro ao listar produtos: {e}")
         return []
 
+def deletar_produto(produto_id):
+    """Remove um produto do banco de dados pelo ID."""
+    try:
+        conexao = conectar()
+        if not conexao:
+            return False
+        cursor = conexao.cursor()
+        cursor.execute("DELETE FROM produtos WHERE id = %s", (produto_id,))
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+        return True
+    except Exception as e:
+        print(f"Erro ao deletar produto: {e}")
+        return False
+
+def atualizar_produto(produto_id, nome, categoria, preco, quantidade):
+    """Atualiza as informações de um produto existente."""
+    try:
+        conexao = conectar()
+        if not conexao:
+            return False
+        cursor = conexao.cursor()
+        cursor.execute("""
+            UPDATE produtos 
+            SET nome = %s, categoria = %s, preco = %s, quantidade = %s 
+            WHERE id = %s
+        """, (nome, categoria, preco, quantidade, produto_id))
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+        return True
+    except Exception as e:
+        print(f"Erro ao atualizar produto: {e}")
+        return False
+
 def obter_metricas_estoque():
     try:
         conexao = conectar()

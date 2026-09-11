@@ -1,0 +1,16 @@
+services:
+  postgres_db:
+    image: postgres:15-alpine
+    container_name: postgres_estoque
+    restart: always
+    environment:
+      POSTGRES_USER: igor
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: estoque_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

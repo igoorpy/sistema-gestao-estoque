@@ -1,35 +1,57 @@
-import sqlite3
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 def conectar():
-    conexao = sqlite3.connect("database/estoque.db")
-    return conexao
+    """Estabelece conexao com o banco de dados PostgreSQL rodando no Docker."""
+    try:
+        conexao = psycopg2.connect(
+            host="localhost",
+            port=5432,
+            database="estoque_db",
+            user="igor",
+            password="postgrespassword"
+        )
+        return conexao
+    except Exception as e:
+        print(f"Erro ao conectar ao PostgreSQL: {e}")
+        return None
 
 def criar_tabelas():
+    """Cria as tabelas do sistema no PostgreSQL se nao existirem."""
     conexao = conectar()
-    cursor = conexao.cursor()
+    if not conexao:
+        return
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS produtos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            categoria TEXT NOT NULL,
-            preco REAL NOT NULL,
-            quantidade INTEGER NOT NULL
-        )
-    """)
+    try:
+        cursor = conexao.cursor()
 
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS vendas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            produto_id INTEGER NOT NULL,
-            quantidade INTEGER NOT NULL,
-            data_venda DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (produto_id) REFERENCES produtos (id)
-        )
-    """)
+        # Tabela de Produtos
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS produtos (
+                id SERIAL PRIMARY KEY,
+                nome VARCHAR(150) NOT NULL,
+                categoria VARCHAR(100) NOT NULL,
+                preco NUMERIC(10, 2) NOT NULL,
+                quantidade INT NOT NULL DEFAULT 0
+            );
+        """)
 
-    conexao.commit()
-    conexao.close()
+        # Tabela de Vendas
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS vendas (
+                id SERIAL PRIMARY KEY,
+                produto_id INT NOT NULL REFERENCES produtos(id) ON DELETE CASCADE,
+                quantidade INT NOT NULL,
+                preco_unitario NUMERIC(10, 2) NOT NULL,
+                total_venda NUMERIC(10, 2) NOT NULL,
+                forma_pagamento VARCHAR(50) DEFAULT 'Dinheiro',
+                data_venda TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
 
-if __name__ == "__main__":
-    criar_tabelas()
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+        print("Tabelas verificadas/criadas com sucesso no PostgreSQL!")
+    except Exception as e:
+        print(f"Erro ao criar tabelas no PostgreSQL: {e}")
